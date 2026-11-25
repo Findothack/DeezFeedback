@@ -1,0 +1,22 @@
+name: Build VST3 (Windows)
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --config Release
+      - name: Collect the VST3
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item -Recurse "build/FeedbackStopper_artefacts/Release/VST3/*" dist/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FeedbackStopper-VST3-Windows
+          path: dist
